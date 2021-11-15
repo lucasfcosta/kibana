@@ -193,7 +193,7 @@ export const CustomFields = memo<Props>(({ validate, dataStreams = [] }) => {
       <EuiSpacer size="m" />
       {isHTTP && <HTTPAdvancedFields validate={validate} />}
       {isTCP && <TCPAdvancedFields />}
-      {isBrowser && <BrowserAdvancedFields />}
+      {isBrowser && <BrowserAdvancedFields validate={validate} />}
     </EuiForm>
   );
 });

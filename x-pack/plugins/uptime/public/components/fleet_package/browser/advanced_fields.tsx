@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { FormattedMessage } from '@kbn/i18n/react';
 import {
   EuiAccordion,
@@ -15,16 +15,23 @@ import {
   EuiFormRow,
   EuiDescribedFormGroup,
   EuiSpacer,
+  EuiFieldNumber,
+  EuiFormControlLayout,
+  EuiText,
 } from '@elastic/eui';
 import { ComboBox } from '../combo_box';
 
 import { useBrowserAdvancedFieldsContext, useBrowserSimpleFieldsContext } from '../contexts';
 
-import { ConfigKeys, ScreenshotOption } from '../types';
+import { ConfigKeys, Validation, ScreenshotOption } from '../types';
 
 import { OptionalLabel } from '../optional_label';
 
-export const BrowserAdvancedFields = () => {
+interface Props {
+  validate: Validation;
+}
+
+export const BrowserAdvancedFields = memo<Props>(({ validate }) => {
   const { fields, setFields } = useBrowserAdvancedFieldsContext();
   const { fields: simpleFields } = useBrowserSimpleFieldsContext();
 
@@ -159,6 +166,133 @@ export const BrowserAdvancedFields = () => {
         <EuiFormRow
           label={
             <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.label"
+              defaultMessage="Download Speed"
+            />
+          }
+          labelAppend={<OptionalLabel />}
+          isInvalid={!!validate[ConfigKeys.DOWNLOAD_SPEED]?.(fields)}
+          helpText={
+            <>
+              <FormattedMessage
+                id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.helpText"
+                defaultMessage="Set this option to control the monitor's download speed. This is useful for simulating your application's behaviour on slower networks."
+              />
+            </>
+          }
+          error={
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.error"
+              defaultMessage="Download speed must be greater than zero."
+            />
+          }
+        >
+          <EuiFormControlLayout
+            append={
+              <EuiText size="xs">
+                <strong>Mbps</strong>
+              </EuiText>
+            }
+          >
+            <EuiFieldNumber
+              min={1}
+              onChange={(event) => {
+                handleInputChange({
+                  value: event.target.value,
+                  configKey: ConfigKeys.DOWNLOAD_SPEED,
+                });
+              }}
+            />
+          </EuiFormControlLayout>
+        </EuiFormRow>
+        <EuiFormRow
+          label={
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.upload.label"
+              defaultMessage="Upload Speed"
+            />
+          }
+          labelAppend={<OptionalLabel />}
+          helpText={
+            <>
+              <FormattedMessage
+                id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.upload.helpText"
+                defaultMessage="Set this option to control the monitor's upload speed. This is useful for simulating your application's behaviour on slower networks."
+              />
+            </>
+          }
+          isInvalid={!!validate[ConfigKeys.UPLOAD_SPEED]?.(fields)}
+          error={
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.upload.error"
+              defaultMessage="Upload speed must be greater than zero."
+            />
+          }
+        >
+          <EuiFormControlLayout
+            append={
+              <EuiText size="xs">
+                <strong>Mbps</strong>
+              </EuiText>
+            }
+          >
+            <EuiFieldNumber
+              min={1}
+              onChange={(event) =>
+                handleInputChange({
+                  value: event.target.value,
+                  configKey: ConfigKeys.UPLOAD_SPEED,
+                })
+              }
+            />
+          </EuiFormControlLayout>
+        </EuiFormRow>
+        <EuiFormRow
+          label={
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.latency.label"
+              defaultMessage="Latency"
+            />
+          }
+          labelAppend={<OptionalLabel />}
+          helpText={
+            <>
+              <FormattedMessage
+                id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.upload.helpText"
+                defaultMessage="Set this option to control the monitor's round-trip time. This is useful for simulating your application's behaviour on laggier networks."
+              />
+            </>
+          }
+          isInvalid={!!validate[ConfigKeys.LATENCY]?.(fields)}
+          error={
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.latency.error"
+              defaultMessage="Latency must not be negative."
+            />
+          }
+        >
+          <EuiFormControlLayout
+            append={
+              <EuiText size="xs">
+                <strong>ms</strong>
+              </EuiText>
+            }
+          >
+            <EuiFieldNumber
+              min={0}
+              onChange={(event) =>
+                handleInputChange({
+                  value: event.target.value,
+                  configKey: ConfigKeys.LATENCY,
+                })
+              }
+            />
+          </EuiFormControlLayout>
+        </EuiFormRow>
+
+        <EuiFormRow
+          label={
+            <FormattedMessage
               id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.screenshots.label"
               defaultMessage="Screenshot options"
             />
@@ -209,7 +343,7 @@ export const BrowserAdvancedFields = () => {
       </EuiDescribedFormGroup>
     </EuiAccordion>
   );
-};
+});
 
 const requestMethodOptions = Object.values(ScreenshotOption).map((option) => ({
   value: option,
