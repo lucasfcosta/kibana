@@ -114,7 +114,7 @@ const validateICMP: ValidationLibrary = {
 };
 
 const validateThrottleValue = (speed: string | undefined, allowZero?: boolean) => {
-  if (speed === undefined) return false;
+  if (speed === undefined || speed === '') return false;
   const throttleValue = parseFloat(speed);
   return isNaN(throttleValue) || (allowZero ? throttleValue < 0 : throttleValue <= 0);
 };
@@ -133,7 +133,7 @@ const validateBrowser: ValidationLibrary = {
     validateThrottleValue(downloadSpeed),
   [ConfigKeys.UPLOAD_SPEED]: ({ [ConfigKeys.UPLOAD_SPEED]: uploadSpeed }) =>
     validateThrottleValue(uploadSpeed),
-  [ConfigKeys.LATENCY]: ({ [ConfigKeys.LATENCY]: latency }) => validateThrottleValue(latency),
+  [ConfigKeys.LATENCY]: ({ [ConfigKeys.LATENCY]: latency }) => validateThrottleValue(latency, true),
 };
 
 export type ValidateDictionary = Record<DataStream, Validation>;

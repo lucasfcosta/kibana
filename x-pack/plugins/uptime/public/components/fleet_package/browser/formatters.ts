@@ -31,6 +31,9 @@ export const browserFormatters: BrowserFormatMap = {
   [ConfigKeys.SOURCE_INLINE]: (fields) => stringToJsonFormatter(fields[ConfigKeys.SOURCE_INLINE]),
   [ConfigKeys.PARAMS]: null,
   [ConfigKeys.SCREENSHOTS]: null,
+  [ConfigKeys.DOWNLOAD_SPEED]: null,
+  [ConfigKeys.UPLOAD_SPEED]: null,
+  [ConfigKeys.LATENCY]: null,
   [ConfigKeys.SYNTHETICS_ARGS]: (fields) =>
     arrayToJsonFormatter(fields[ConfigKeys.SYNTHETICS_ARGS]),
   [ConfigKeys.ZIP_URL_TLS_CERTIFICATE_AUTHORITIES]: (fields) =>

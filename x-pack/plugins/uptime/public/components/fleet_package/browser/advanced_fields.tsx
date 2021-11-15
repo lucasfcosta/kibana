@@ -16,7 +16,6 @@ import {
   EuiDescribedFormGroup,
   EuiSpacer,
   EuiFieldNumber,
-  EuiFormControlLayout,
   EuiText,
 } from '@elastic/eui';
 import { ComboBox } from '../combo_box';
@@ -187,23 +186,22 @@ export const BrowserAdvancedFields = memo<Props>(({ validate }) => {
             />
           }
         >
-          <EuiFormControlLayout
+          <EuiFieldNumber
+            min={0}
+            step={0.001}
+            value={fields[ConfigKeys.DOWNLOAD_SPEED]}
+            onChange={(event) => {
+              handleInputChange({
+                value: event.target.value,
+                configKey: ConfigKeys.DOWNLOAD_SPEED,
+              });
+            }}
             append={
               <EuiText size="xs">
                 <strong>Mbps</strong>
               </EuiText>
             }
-          >
-            <EuiFieldNumber
-              min={1}
-              onChange={(event) => {
-                handleInputChange({
-                  value: event.target.value,
-                  configKey: ConfigKeys.DOWNLOAD_SPEED,
-                });
-              }}
-            />
-          </EuiFormControlLayout>
+          />
         </EuiFormRow>
         <EuiFormRow
           label={
@@ -229,23 +227,22 @@ export const BrowserAdvancedFields = memo<Props>(({ validate }) => {
             />
           }
         >
-          <EuiFormControlLayout
+          <EuiFieldNumber
+            min={0}
+            step={0.001}
+            value={fields[ConfigKeys.UPLOAD_SPEED]}
+            onChange={(event) =>
+              handleInputChange({
+                value: event.target.value,
+                configKey: ConfigKeys.UPLOAD_SPEED,
+              })
+            }
             append={
               <EuiText size="xs">
                 <strong>Mbps</strong>
               </EuiText>
             }
-          >
-            <EuiFieldNumber
-              min={1}
-              onChange={(event) =>
-                handleInputChange({
-                  value: event.target.value,
-                  configKey: ConfigKeys.UPLOAD_SPEED,
-                })
-              }
-            />
-          </EuiFormControlLayout>
+          />
         </EuiFormRow>
         <EuiFormRow
           label={
@@ -258,7 +255,7 @@ export const BrowserAdvancedFields = memo<Props>(({ validate }) => {
           helpText={
             <>
               <FormattedMessage
-                id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.upload.helpText"
+                id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.latency.helpText"
                 defaultMessage="Set this option to control the monitor's round-trip time. This is useful for simulating your application's behaviour on laggier networks."
               />
             </>
@@ -271,23 +268,21 @@ export const BrowserAdvancedFields = memo<Props>(({ validate }) => {
             />
           }
         >
-          <EuiFormControlLayout
+          <EuiFieldNumber
+            min={0}
+            value={fields[ConfigKeys.LATENCY]}
+            onChange={(event) =>
+              handleInputChange({
+                value: event.target.value,
+                configKey: ConfigKeys.LATENCY,
+              })
+            }
             append={
               <EuiText size="xs">
                 <strong>ms</strong>
               </EuiText>
             }
-          >
-            <EuiFieldNumber
-              min={0}
-              onChange={(event) =>
-                handleInputChange({
-                  value: event.target.value,
-                  configKey: ConfigKeys.LATENCY,
-                })
-              }
-            />
-          </EuiFormControlLayout>
+          />
         </EuiFormRow>
 
         <EuiFormRow

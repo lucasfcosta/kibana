@@ -25,6 +25,9 @@ export const initialValues: IBrowserAdvancedFields = {
   [ConfigKeys.JOURNEY_FILTERS_MATCH]: '',
   [ConfigKeys.JOURNEY_FILTERS_TAGS]: [],
   [ConfigKeys.IGNORE_HTTPS_ERRORS]: false,
+  [ConfigKeys.DOWNLOAD_SPEED]: '',
+  [ConfigKeys.UPLOAD_SPEED]: '',
+  [ConfigKeys.LATENCY]: '',
 };
 
 const defaultContext: IBrowserAdvancedFieldsContext = {
