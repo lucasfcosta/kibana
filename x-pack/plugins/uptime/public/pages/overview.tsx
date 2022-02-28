@@ -5,7 +5,7 @@
  * 2.0.
  */
 
-import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -16,6 +16,17 @@ import { StatusPanel } from '../components/overview/status_panel';
 import { QueryBar } from '../components/overview/query_bar/query_bar';
 import { MONITORING_OVERVIEW_LABEL } from '../routes';
 import { FilterGroup } from '../components/overview/filter_group/filter_group';
+import { useKibana } from '../../../../../src/plugins/kibana_react/public';
+
+// TODO: rely on security plugin type instead of inline type
+interface ApiKey {
+  encoded: string;
+}
+
+const isApiKey = (maybeKey: unknown): maybeKey is ApiKey => {
+  const encoded = (maybeKey as ApiKey).encoded;
+  return typeof encoded === 'string';
+};
 
 const EuiFlexItemStyled = styled(EuiFlexItem)`
   && {
@@ -34,10 +45,36 @@ export const OverviewPageComponent = () => {
   useTrackPageview({ app: 'uptime', path: 'overview', delay: 15000 });
 
   useBreadcrumbs([{ text: MONITORING_OVERVIEW_LABEL }]); // No extra breadcrumbs on overview
+  const [key, setKey] = React.useState<ApiKey | null>(null);
+  const { services } = useKibana();
+  React.useEffect(() => {
+    if (!key) {
+      console.log('inside block');
+      async function getKey() {
+        const k = await services.http?.get('/internal/uptime/api_key');
+        console.log('result!', key);
+        if (isApiKey(k)) {
+          setKey(k);
+        }
+      }
+      getKey();
+    }
+  }, [key]);
 
+  console.log('the key', key);
   return (
     <>
       <EuiFlexGroup gutterSize="xs" wrap responsive={false}>
+        <EuiButton
+          href={
+            key
+              ? `elastic-synthetics-recorder-dev://${key.encoded}`
+              : 'elastic-synthetics-recorder://'
+          }
+          isDisabled={!key}
+        >
+          Open recorder
+        </EuiButton>
         <QueryBar />
         <EuiFlexItemStyled grow={true}>
           <FilterGroup />
