@@ -5,7 +5,6 @@
  * 2.0.
  */
 
-import { SavedObjectsClientContract } from 'kibana/server';
 import { UMKibanaRouteWrapper } from './types';
 import { createUptimeESClient, inspectableEsQueriesMap } from '../lib/lib';
 
@@ -14,6 +13,7 @@ import { KibanaResponse } from '../../../../../src/core/server/http/router';
 import { enableInspectEsQueries } from '../../../observability/common';
 import { syntheticsServiceApiKey } from '../lib/saved_objects/service_api_key';
 import { API_URLS } from '../../common/constants';
+import { RECORDER_API_KEY_NAME } from './api_key';
 
 export const uptimeRouteWrapper: UMKibanaRouteWrapper = (uptimeRoute, server) => ({
   ...uptimeRoute,
@@ -22,14 +22,14 @@ export const uptimeRouteWrapper: UMKibanaRouteWrapper = (uptimeRoute, server) =>
   },
   handler: async (context, request, response) => {
     const { client: esClient } = context.core.elasticsearch;
-    let savedObjectsClient: SavedObjectsClientContract;
+    const includedHiddenTypes = [RECORDER_API_KEY_NAME];
     if (server.config?.ui?.monitorManagement?.enabled) {
-      savedObjectsClient = context.core.savedObjects.getClient({
-        includedHiddenTypes: [syntheticsServiceApiKey.name],
-      });
-    } else {
-      savedObjectsClient = context.core.savedObjects.client;
+      includedHiddenTypes.push(syntheticsServiceApiKey.name);
     }
+
+    const savedObjectsClient = context.core.savedObjects.getClient({
+      includedHiddenTypes,
+    });
 
     // specifically needed for the synthetics service api key generation
     server.authSavedObjectsClient = savedObjectsClient;

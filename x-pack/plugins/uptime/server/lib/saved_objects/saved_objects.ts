@@ -18,6 +18,7 @@ import { UptimeConfig } from '../../../common/config';
 import { settingsObjectId, umDynamicSettings } from './uptime_settings';
 import { syntheticsMonitor } from './synthetics_monitor';
 import { syntheticsServiceApiKey } from './service_api_key';
+import { recorderApiKey, RECORDER_API_KEY_NAME } from '../../rest_api/api_key';
 
 export const registerUptimeSavedObjects = (
   savedObjectsService: SavedObjectsServiceSetup,
@@ -35,6 +36,12 @@ export const registerUptimeSavedObjects = (
       attributesToEncrypt: new Set(['apiKey']),
     });
   }
+
+  savedObjectsService.registerType(recorderApiKey);
+  encryptedSavedObjects.registerType({
+    type: RECORDER_API_KEY_NAME,
+    attributesToEncrypt: new Set(['apiKey']),
+  });
 };
 
 export interface UMSavedObjectsAdapter {

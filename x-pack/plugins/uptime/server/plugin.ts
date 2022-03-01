@@ -29,6 +29,7 @@ import { Dataset } from '../../rule_registry/server';
 import { UptimeConfig } from '../common/config';
 import { SyntheticsService } from './lib/synthetics_service/synthetics_service';
 import { syntheticsServiceApiKey } from './lib/saved_objects/service_api_key';
+import { RECORDER_API_KEY_NAME } from './rest_api/api_key';
 
 export type UptimeRuleRegistry = ReturnType<Plugin['setup']>['ruleRegistry'];
 
@@ -112,15 +113,15 @@ export class Plugin implements PluginType {
   }
 
   public start(coreStart: CoreStart, plugins: UptimeCorePluginsStart) {
+    const internalRepoNames = [RECORDER_API_KEY_NAME];
+
     if (this.isServiceEnabled) {
-      this.savedObjectsClient = new SavedObjectsClient(
-        coreStart.savedObjects.createInternalRepository([syntheticsServiceApiKey.name])
-      );
-    } else {
-      this.savedObjectsClient = new SavedObjectsClient(
-        coreStart.savedObjects.createInternalRepository()
-      );
+      internalRepoNames.push(syntheticsServiceApiKey.name);
     }
+
+    this.savedObjectsClient = new SavedObjectsClient(
+      coreStart.savedObjects.createInternalRepository(internalRepoNames)
+    );
 
     if (this.server) {
       this.server.security = plugins.security;
