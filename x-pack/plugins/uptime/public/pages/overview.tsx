@@ -40,41 +40,57 @@ const EuiFlexItemStyled = styled(EuiFlexItem)`
   }
 `;
 
-export const OverviewPageComponent = () => {
-  useTrackPageview({ app: 'uptime', path: 'overview' });
-  useTrackPageview({ app: 'uptime', path: 'overview', delay: 15000 });
-
-  useBreadcrumbs([{ text: MONITORING_OVERVIEW_LABEL }]); // No extra breadcrumbs on overview
+/**
+ * TODO: this component doesn't belong here
+ */
+const ScriptRecorderButton = () => {
   const [key, setKey] = React.useState<ApiKey | null>(null);
   const { services } = useKibana();
+
   React.useEffect(() => {
     if (!key) {
-      console.log('inside block');
       async function getKey() {
         const k = await services.http?.get('/internal/uptime/api_key');
-        console.log('result!', key);
         if (isApiKey(k)) {
           setKey(k);
         }
       }
       getKey();
     }
-  }, [key]);
+  }, [key, services.http]);
 
-  console.log('the key', key);
+  // TODO: hacky way of getting the base Kibana URL, there's probably a better and more durable way
+  const url =
+    services.application
+      ?.getUrlForApp('uptime', { absolute: true })
+      .split('/')
+      .filter((_, index) => index === 0 || index === 2)
+      .join('//') + '/';
+
+  return (
+    <EuiButton
+      href={
+        key
+          ? `elastic-synthetics-recorder-dev://apiKey=${key.encoded}&kibanaUrl=${url}`
+          : 'elastic-synthetics-recorder://'
+      }
+      isDisabled={!key}
+    >
+      Open recorder
+    </EuiButton>
+  );
+};
+
+export const OverviewPageComponent = () => {
+  useTrackPageview({ app: 'uptime', path: 'overview' });
+  useTrackPageview({ app: 'uptime', path: 'overview', delay: 15000 });
+
+  useBreadcrumbs([{ text: MONITORING_OVERVIEW_LABEL }]); // No extra breadcrumbs on overview
+
   return (
     <>
       <EuiFlexGroup gutterSize="xs" wrap responsive={false}>
-        <EuiButton
-          href={
-            key
-              ? `elastic-synthetics-recorder-dev://${key.encoded}`
-              : 'elastic-synthetics-recorder://'
-          }
-          isDisabled={!key}
-        >
-          Open recorder
-        </EuiButton>
+        <ScriptRecorderButton />
         <QueryBar />
         <EuiFlexItemStyled grow={true}>
           <FilterGroup />
