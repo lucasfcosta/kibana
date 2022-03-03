@@ -60,18 +60,14 @@ const ScriptRecorderButton = () => {
   }, [key, services.http]);
 
   // TODO: hacky way of getting the base Kibana URL, there's probably a better and more durable way
-  const url =
-    services.application
-      ?.getUrlForApp('uptime', { absolute: true })
-      .split('/')
-      .filter((_, index) => index === 0 || index === 2)
-      .join('//') + '/';
+  const appUrl = services.application?.getUrlForApp('', { absolute: true });
+  const kibanaUrl = appUrl ? appUrl.slice(0, appUrl.indexOf('/app')) : '';
 
   return (
     <EuiButton
       href={
         key
-          ? `elastic-synthetics-recorder-dev://apiKey=${key.encoded}&kibanaUrl=${url}`
+          ? `elastic-synthetics-recorder-dev://apiKey=${key.encoded}&kibanaUrl=${kibanaUrl}`
           : 'elastic-synthetics-recorder://'
       }
       isDisabled={!key}
