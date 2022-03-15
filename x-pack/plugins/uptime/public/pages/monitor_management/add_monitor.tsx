@@ -37,7 +37,7 @@ export const AddMonitorPage: React.FC = () => {
           allowedScheduleUnits: [ScheduleUnit.MINUTES],
         }}
       >
-        <MonitorConfig isEdit={false} />
+        <MonitorConfig isEdit={false} locations={locations} />
       </SyntheticsProviders>
     </Loader>
   );

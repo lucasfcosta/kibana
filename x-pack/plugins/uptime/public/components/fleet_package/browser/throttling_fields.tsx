@@ -11,7 +11,7 @@ import { EuiSwitch, EuiSpacer, EuiFormRow, EuiFieldNumber, EuiText } from '@elas
 import { DescribedFormGroupWithWrap } from '../common/described_form_group_with_wrap';
 
 import { OptionalLabel } from '../optional_label';
-import { useBrowserAdvancedFieldsContext } from '../contexts';
+import { useBrowserAdvancedFieldsContext, usePolicyConfigContext } from '../contexts';
 import { Validation, ConfigKey } from '../types';
 
 interface Props {
@@ -28,12 +28,13 @@ type ThrottlingConfigs =
 
 export const ThrottlingFields = memo<Props>(({ validate, minColumnWidth, onFieldBlur }) => {
   const { fields, setFields } = useBrowserAdvancedFieldsContext();
+  const { locations } = usePolicyConfigContext();
 
   const handleInputChange = useCallback(
     ({ value, configKey }: { value: unknown; configKey: ThrottlingConfigs }) => {
-      setFields((prevFields) => ({ ...prevFields, [configKey]: value }));
+      setFields((prevFields) => ({ ...prevFields, locations, [configKey]: value }));
     },
-    [setFields]
+    [setFields, locations]
   );
 
   const throttlingInputs = fields[ConfigKey.IS_THROTTLING_ENABLED] ? (
@@ -49,10 +50,17 @@ export const ThrottlingFields = memo<Props>(({ validate, minColumnWidth, onField
         labelAppend={<OptionalLabel />}
         isInvalid={!!validate[ConfigKey.DOWNLOAD_SPEED]?.(fields)}
         error={
-          <FormattedMessage
-            id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.error"
-            defaultMessage="Download speed must be greater than zero."
-          />
+          locations && locations.length > 0 ? (
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.error_with_bandwidth"
+              defaultMessage="Download speed must be greater than zero and within bandwidth limit."
+            />
+          ) : (
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.error"
+              defaultMessage="Download speed must be greater than zero."
+            />
+          )
         }
       >
         <EuiFieldNumber
@@ -84,10 +92,17 @@ export const ThrottlingFields = memo<Props>(({ validate, minColumnWidth, onField
         labelAppend={<OptionalLabel />}
         isInvalid={!!validate[ConfigKey.UPLOAD_SPEED]?.(fields)}
         error={
-          <FormattedMessage
-            id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.upload.error"
-            defaultMessage="Upload speed must be greater than zero."
-          />
+          locations && locations.length > 0 ? (
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.error_with_bandwidth"
+              defaultMessage="Upload speed must be greater than zero and within bandwidth limit."
+            />
+          ) : (
+            <FormattedMessage
+              id="xpack.uptime.createPackagePolicy.stepConfigure.browserAdvancedSettings.throttling.download.error"
+              defaultMessage="Upload speed must be greater than zero."
+            />
+          )
         }
       >
         <EuiFieldNumber

@@ -20,7 +20,7 @@ interface Props {
 }
 
 export const MonitorManagementAdvancedFields = memo<Props>(
-  ({ validate, minColumnWidth, onFieldBlur }) => {
+  ({ validate, minColumnWidth, onFieldBlur, isService }) => {
     const { namespace, setNamespace } = usePolicyConfigContext();
 
     const namespaceErrorMsg = validate[ConfigKey.NAMESPACE]?.({

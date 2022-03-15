@@ -19,6 +19,8 @@ export const getDevLocation = (devUrl: string): ServiceLocation => ({
   label: 'Local Synthetics Service',
   geo: { lat: 0, lon: 0 },
   url: devUrl,
+  downloadBandwidthLimit: 100,
+  uploadBandwidthLimit: 30,
 });
 
 export async function getServiceLocations(server: UptimeServerSetup) {
@@ -44,6 +46,9 @@ export async function getServiceLocations(server: UptimeServerSetup) {
         geo: location.geo.location,
         url: location.url,
         isServiceManaged: true,
+        // TODO use the same constants here
+        downloadBandwidthLimit: location.downloadBandwidthLimit,
+        uploadBandwidthLimit: location.uploadBandwidthLimit,
       });
     });
 

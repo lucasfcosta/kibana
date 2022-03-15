@@ -7,6 +7,18 @@
 
 import { isLeft } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
+import { tEnum } from '../../utils/t_enum';
+
+export enum BandwidthLimitKey {
+  DOWNLOAD = 'downloadBandwidthLimit',
+  UPLOAD = 'uploadBandwidthLimit',
+}
+
+export const BandwidthLimitKeyCodec = tEnum<BandwidthLimitKey>(
+  'BandwidthLimitKey',
+  BandwidthLimitKey
+);
+export type BandwidthLimitKeyType = t.TypeOf<typeof BandwidthLimitKeyCodec>;
 
 const LocationGeoCodec = t.interface({
   lat: t.number,
@@ -19,6 +31,8 @@ export const ManifestLocationCodec = t.interface({
     name: t.string,
     location: LocationGeoCodec,
   }),
+  [BandwidthLimitKey.DOWNLOAD]: t.union([t.number, t.undefined]),
+  [BandwidthLimitKey.UPLOAD]: t.union([t.number, t.undefined]),
   status: t.string,
 });
 
@@ -27,6 +41,8 @@ export const ServiceLocationCodec = t.interface({
   label: t.string,
   geo: LocationGeoCodec,
   url: t.string,
+  [BandwidthLimitKey.DOWNLOAD]: t.union([t.number, t.undefined]),
+  [BandwidthLimitKey.UPLOAD]: t.union([t.number, t.undefined]),
 });
 
 export const ServiceLocationErrors = t.array(

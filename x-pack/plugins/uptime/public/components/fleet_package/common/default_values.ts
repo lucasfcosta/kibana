@@ -20,6 +20,5 @@ export const defaultValues: CommonFields = {
   [ConfigKey.TAGS]: [],
   [ConfigKey.TIMEOUT]: '16',
   [ConfigKey.NAME]: '',
-  [ConfigKey.LOCATIONS]: [],
   [ConfigKey.NAMESPACE]: DEFAULT_NAMESPACE_STRING,
 };

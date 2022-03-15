@@ -25,9 +25,17 @@ import { ActionBarPortal } from '../action_bar/action_bar_portal';
 import { useFormatMonitor } from '../hooks/use_format_monitor';
 import { MonitorFields } from './monitor_fields';
 import { TestNowMode, TestRun } from '../test_now_mode/test_now_mode';
-import { MonitorFields as MonitorFieldsType } from '../../../../common/runtime_types';
+import {
+  MonitorFields as MonitorFieldsType,
+  ServiceLocations,
+} from '../../../../common/runtime_types';
 
-export const MonitorConfig = ({ isEdit = false }: { isEdit: boolean }) => {
+interface MonitorConfigProps {
+  isEdit: boolean;
+  locations: ServiceLocations;
+}
+
+export const MonitorConfig: React.FC<MonitorConfigProps> = ({ isEdit = false }) => {
   const { monitorType } = usePolicyConfigContext();
 
   /* raw policy config compatible with the UI. Save this to saved objects */

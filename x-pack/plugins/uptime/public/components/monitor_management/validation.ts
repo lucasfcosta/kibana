@@ -11,11 +11,18 @@ import {
   ScheduleUnit,
   MonitorFields,
   isServiceLocationInvalid,
+  ServiceLocations,
+  BandwidthLimitKey,
 } from '../../../common/runtime_types';
 import { Validation } from '../../../common/types';
 
 export const digitsOnly = /^[0-9]*$/g;
 export const includesValidPort = /[^\:]+:[0-9]{1,5}$/g;
+
+export const DEFAULT_BANDWIDTH_LIMIT = {
+  [BandwidthLimitKey.DOWNLOAD]: 100,
+  [BandwidthLimitKey.UPLOAD]: 30,
+};
 
 // returns true if invalid
 function validateHeaders<T>(headers: T): boolean {
@@ -86,7 +93,8 @@ export const validateCommon: Validation = {
       })
     );
   },
-  [ConfigKey.LOCATIONS]: ({ [ConfigKey.LOCATIONS]: locations }) => {
+  [ConfigKey.LOCATIONS]: (config) => {
+    const { [ConfigKey.LOCATIONS]: locations } = config;
     return (
       !Array.isArray(locations) || locations.length < 1 || locations.some(isServiceLocationInvalid)
     );
@@ -136,7 +144,29 @@ const validateICMP: Validation = {
 const validateThrottleValue = (speed: string | undefined, allowZero?: boolean) => {
   if (speed === undefined || speed === '') return false;
   const throttleValue = parseFloat(speed);
+
   return isNaN(throttleValue) || (allowZero ? throttleValue < 0 : throttleValue <= 0);
+};
+
+const validateBandwidth = (
+  speed: string | undefined,
+  bandwidthLimitKey: BandwidthLimitKey,
+  locations: ServiceLocations = [],
+  allowZero?: boolean
+) => {
+  const isInvalidThrottleValue = validateThrottleValue(speed, allowZero);
+  if (isInvalidThrottleValue) return true;
+
+  const defaultLimit = DEFAULT_BANDWIDTH_LIMIT[bandwidthLimitKey];
+  const throttleValue = parseFloat(speed as string);
+
+  const minLocationBandwidth = locations.reduce<number>((maxBandwidth, location) => {
+    const currentBandwidth = location[bandwidthLimitKey] || defaultLimit;
+    const isNewMinBandwidth = currentBandwidth < maxBandwidth;
+    return isNewMinBandwidth ? currentBandwidth : maxBandwidth;
+  }, defaultLimit);
+
+  return throttleValue > minLocationBandwidth;
 };
 
 const validateBrowser: Validation = {
@@ -149,10 +179,16 @@ const validateBrowser: Validation = {
     [ConfigKey.SOURCE_ZIP_URL]: zipUrl,
     [ConfigKey.SOURCE_INLINE]: inlineScript,
   }) => !zipUrl && !inlineScript,
-  [ConfigKey.DOWNLOAD_SPEED]: ({ [ConfigKey.DOWNLOAD_SPEED]: downloadSpeed }) =>
-    validateThrottleValue(downloadSpeed),
-  [ConfigKey.UPLOAD_SPEED]: ({ [ConfigKey.UPLOAD_SPEED]: uploadSpeed }) =>
-    validateThrottleValue(uploadSpeed),
+  [ConfigKey.DOWNLOAD_SPEED]: ({
+    [ConfigKey.LOCATIONS]: locations,
+    [ConfigKey.DOWNLOAD_SPEED]: downloadSpeed,
+  }) => validateBandwidth(downloadSpeed, BandwidthLimitKey.DOWNLOAD, locations),
+  [ConfigKey.UPLOAD_SPEED]: (config) => {
+    const { [ConfigKey.LOCATIONS]: locations, [ConfigKey.UPLOAD_SPEED]: uploadSpeed } = config;
+    console.log(config);
+
+    return validateBandwidth(uploadSpeed, BandwidthLimitKey.UPLOAD, locations);
+  },
   [ConfigKey.LATENCY]: ({ [ConfigKey.LATENCY]: latency }) => validateThrottleValue(latency, true),
 };
 
